@@ -157,9 +157,41 @@ class CustomForm extends \CBitrixComponent
 
     public function saveFormAjaxAction()
 	{
-		// парсинг результата и отправка сообщения
+        // парсинг результата и отправка сообщения
         $response = [];
         $post = $this->request->getPostList()->toArray();
+        $file = $this->request->getFile("FILE");
+
+        if($file['name']) {
+            $arr_file=Array(
+                "name" =>  $file['name'],
+                "size" => $file['size'],
+                "tmp_name" => $file['tmp_name'],
+                "type" => $file['type'],
+                "old_file" => "",
+                "del" => "Y",
+                "MODULE_ID" => '');
+            $fid = \CFile::SaveFile($arr_file, "enquiry");
+        }
+
+        $spec = [];
+        foreach ($post as $key=>$value) {
+            $linenum = preg_replace("/[^0-9]/", '', $key);
+            if($linenum) {
+                $code = preg_replace("/[^A-Z]/", '', $key);
+                $spec[$linenum][$code] = $value;
+            }
+        }
+
+        if($spec) {
+            $str = '<table>';
+            foreach ($spec as $item) {
+                $str .= '<tr><td>'.$item['BRAND'].'</td><td>'.$item['PRODUCTTITLE'].'</td><td>'.
+                    $item['QTY'].'</td><td>'.$item['FASHION'].'</td><td>'.$item['CLIENT'].'</td></tr>';
+            }
+            $str .= '</table>';
+        }
+
 
         if(!$post['CATEGORY']) {
             $response['error'] = 'категория ';
@@ -170,15 +202,22 @@ class CustomForm extends \CBitrixComponent
         if($response['error']) {
             $response['error'] = "не заполнено поле:".$response['error'];
         }
-        // так как по условиям задачи письмо идет в произвольном виде, не перечислял все параметры
-        // обработку signedParameters также пропустил
+
         if(!$response) {
             \CEvent::Send(
                 "ENQUIRY",
                 SITE_ID,
                 [
-                    "ORDER_TITLE" => $post['ORDER_TITLE']
-                ]
+                    'ORDER_TITLE' => $post['ORDER_TITLE'],
+                    'CATEGORY' =>  $post['CATEGORY'],
+                    'ORDER_TYPE' => $post['ORDER_TYPE'],
+                    'WAREHOUSE' => $post['WAREHOUSE'],
+                    'COMMENT' => $post['COMMENT'],
+                    'SPEC' => $str
+                ],
+                'N',
+                '',
+                array($fid)
             );
         }
 
