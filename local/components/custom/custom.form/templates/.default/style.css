@@ -1,0 +1,13 @@
+.hover-icons {
+	cursor: pointer;
+}
+
+.main-label {
+	font-weight: bold;
+	font-size: 16px;
+}
+
+.column-label {
+	font-size: 14px;
+	color: brown;
+}
