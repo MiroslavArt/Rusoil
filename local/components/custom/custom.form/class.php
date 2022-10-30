@@ -171,6 +171,7 @@ class CustomForm extends \CBitrixComponent
             $response['error'] = "не заполнено поле:".$response['error'];
         }
         // так как по условиям задачи письмо идет в произвольном виде, не перечислял все параметры
+        // обработку signedParameters также пропустил
         if(!$response) {
             \CEvent::Send(
                 "ENQUIRY",
