@@ -176,7 +176,7 @@ class CustomForm extends \CBitrixComponent
                 "ENQUIRY",
                 SITE_ID,
                 [
-                    "ORDER_TITLE" => $_POST['ORDER_TITLE']
+                    "ORDER_TITLE" => $post['ORDER_TITLE']
                 ]
             );
         }
